@@ -3,6 +3,7 @@ package com.ruibin.actions;
 import java.io.Serializable;
 
 public class Action implements Serializable {
+    private int id;
     private String title;
     private String description;
     private long createTime;
@@ -13,12 +14,22 @@ public class Action implements Serializable {
     public Action() {
     }
 
-    public Action(String title, String description, long createTime, long dueTime, long achieveTime) {
+    public Action(int id, String title, String description, long createTime, long dueTime, long achieveTime, boolean isAchieved) {
+        this.id = id;
         this.title = title;
         this.description = description;
         this.createTime = createTime;
         this.dueTime = dueTime;
         this.achieveTime = achieveTime;
+        this.isAchieved = isAchieved;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getTitle() {

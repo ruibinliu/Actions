@@ -1,7 +1,12 @@
 package com.ruibin.actions;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
@@ -16,11 +21,13 @@ public class MainActivity extends Activity {
     private RecyclerView.LayoutManager mLayoutManager;
     private ArrayList<Action> mActions;
     private MyAdapter.Callback mCallback;
+    private LocalBroadcastManager broadcastManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
 
         // use this setting to improve performance if you know that changes
@@ -32,14 +39,37 @@ public class MainActivity extends Activity {
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         mActions = new ArrayList<Action>();
-        for (int i = 0; i < 10; i++) {
-            mActions.add(new Action("Action Item " + i, "Description " + i, 0, 0, 0));
-        }
         mCallback = new ActionCallback();
 
         // specify an adapter (see also next example)
         mAdapter = new MyAdapter(mActions, mCallback);
         mRecyclerView.setAdapter(mAdapter);
+
+        reload();
+
+        broadcastManager = LocalBroadcastManager.getInstance(this);
+
+        IntentFilter filter = new IntentFilter(ActionController.ACTION_DATABASE_CHANGED);
+        broadcastManager.registerReceiver(databaseChangedReceiver, filter);
+    }
+
+    @Override
+    protected void onDestroy() {
+        broadcastManager.unregisterReceiver(databaseChangedReceiver);
+        super.onDestroy();
+    }
+
+    private BroadcastReceiver databaseChangedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            reload();
+        }
+    };
+
+    private void reload() {
+        mActions.clear();
+        mActions.addAll(DatabaseController.getInstance().select());
+        mAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -57,7 +87,6 @@ public class MainActivity extends Activity {
 
             default:
                 return super.onOptionsItemSelected(item);
-
         }
     }
 

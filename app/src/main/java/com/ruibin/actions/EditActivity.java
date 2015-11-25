@@ -13,13 +13,6 @@ import android.widget.Toast;
 public class EditActivity extends Activity {
     private static final String EXTRA_ACTION = "action";
 
-    private EditText mTitleText;
-    private EditText mDescriptionText;
-
-    private Action mAction;
-
-    private boolean mIsEdit;
-
     public static void start(Context context) {
         start(context, null);
     }
@@ -32,6 +25,12 @@ public class EditActivity extends Activity {
         context.startActivity(intent);
     }
 
+    private EditText mTitleText;
+
+    private EditText mDescriptionText;
+
+    private Action mAction;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,7 +41,7 @@ public class EditActivity extends Activity {
 
         Intent intent = getIntent();
         mAction = (Action) intent.getSerializableExtra(EXTRA_ACTION);
-        if (!(mIsEdit = (mAction != null))) {
+        if (mAction == null) {
             mAction = new Action();
         }
 
@@ -61,7 +60,10 @@ public class EditActivity extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_save:
-                saveAction();
+                mAction.setTitle(mTitleText.getText().toString());
+                mAction.setDescription(mDescriptionText.getText().toString());
+                ActionController.getInstance().save(mAction);
+                makeToast(R.string.save_success);
                 finish();
                 break;
             case R.id.action_discard:
@@ -72,14 +74,8 @@ public class EditActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void saveAction() {
-        if (mIsEdit) {
-            // TODO Update
-            makeToast("Update");
-        } else {
-            // TODO Insert
-            makeToast("Insert");
-        }
+    private void makeToast(int resId) {
+        Toast.makeText(this, resId, Toast.LENGTH_LONG).show();
     }
 
     private void makeToast(String text) {
