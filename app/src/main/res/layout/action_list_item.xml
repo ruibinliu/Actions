@@ -4,10 +4,10 @@
     android:id="@+id/card_view"
     android:layout_width="match_parent"
     android:layout_height="@dimen/grid_size"
-    android:layout_marginBottom="@dimen/micro_padding"
-    android:layout_marginLeft="@dimen/small_padding"
-    android:layout_marginRight="@dimen/small_padding"
-    android:layout_marginTop="@dimen/micro_padding"
+    android:layout_marginLeft="@dimen/activity_vertical_margin"
+    android:layout_marginRight="@dimen/activity_vertical_margin"
+    android:layout_marginTop="@dimen/small_padding"
+    android:layout_marginBottom="@dimen/small_padding"
     card_view:cardCornerRadius="4dp"
     card_view:cardElevation="4dp">
 

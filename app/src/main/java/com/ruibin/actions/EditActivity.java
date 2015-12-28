@@ -1,16 +1,17 @@
 package com.ruibin.actions;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.Toast;
 
-public class EditActivity extends Activity {
+public class EditActivity extends AppCompatActivity {
     private static final String EXTRA_ACTION = "action";
 
     public static void start(Context context) {
@@ -25,6 +26,8 @@ public class EditActivity extends Activity {
         context.startActivity(intent);
     }
 
+    private Toolbar mToolbar;
+
     private EditText mTitleText;
 
     private EditText mDescriptionText;
@@ -35,6 +38,10 @@ public class EditActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit);
+
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
+        mToolbar.setOnMenuItemClickListener(mMenuItemClickListener);
 
         mTitleText = (EditText) findViewById(R.id.title);
         mDescriptionText = (EditText) findViewById(R.id.description);
@@ -51,28 +58,31 @@ public class EditActivity extends Activity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_edit, menu);
+        getMenuInflater().inflate(R.menu.menu_edit, menu);
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_save:
-                mAction.setTitle(mTitleText.getText().toString());
-                mAction.setDescription(mDescriptionText.getText().toString());
-                ActionController.getInstance().save(mAction);
-                makeToast(R.string.save_success);
-                finish();
-                break;
-            case R.id.action_discard:
-                finish();
-                break;
-        }
+    private Toolbar.OnMenuItemClickListener mMenuItemClickListener= new Toolbar.OnMenuItemClickListener() {
+        @Override
+        public boolean onMenuItemClick(MenuItem menuItem) {
+            switch (menuItem.getItemId()) {
+                case R.id.action_save:
+                    mAction.setTitle(mTitleText.getText().toString());
+                    mAction.setDescription(mDescriptionText.getText().toString());
+                    ActionController.getInstance().save(mAction);
+                    makeToast(R.string.save_success);
+                    finish();
+                    break;
+                case R.id.action_discard:
+                    finish();
+                    break;
+                default:
+                    break;
+            }
 
-        return super.onOptionsItemSelected(item);
-    }
+            return true;
+        }
+    };
 
     private void makeToast(int resId) {
         Toast.makeText(this, resId, Toast.LENGTH_LONG).show();
