@@ -43,7 +43,8 @@ public class DatabaseController {
 
         SQLiteDatabase database = databaseOpenHelper.getReadableDatabase();
 
-        Cursor cursor = database.query(ActionTable.TABLE_NAME, null, null, null, null, null, null);
+        Cursor cursor = database.query(ActionTable.TABLE_NAME, null, null, null, null, null,
+                ActionColumns.ID + " desc");
         if (cursor != null) {
             try {
                 if (cursor.moveToFirst()) {
@@ -79,6 +80,12 @@ public class DatabaseController {
         return action;
     }
 
+    public void delete() {
+        SQLiteDatabase database = databaseOpenHelper.getWritableDatabase();
+
+        database.delete(ActionTable.TABLE_NAME, null, null);
+    }
+
     private Action readRow(Cursor cursor) {
         int indexId = cursor.getColumnIndexOrThrow(ActionTable.ID);
         int indexTitle = cursor.getColumnIndexOrThrow(ActionTable.TITLE);
@@ -110,7 +117,8 @@ public class DatabaseController {
         ContentValues values = convertToContentValues(action);
 
         SQLiteDatabase database = databaseOpenHelper.getWritableDatabase();
-        database.update(ActionTable.TABLE_NAME, values, ActionTable.ID + "=?", new String[]{String.valueOf(action.getId())});
+        database.update(ActionTable.TABLE_NAME, values, ActionTable.ID + "=?", new
+                String[]{String.valueOf(action.getId())});
     }
 
     private ContentValues convertToContentValues(Action action) {
@@ -128,7 +136,8 @@ public class DatabaseController {
     static class DatabaseOpenHelper extends SQLiteOpenHelper {
         private static final String DATABASE_NAME = "action.db";
         private static final int DATABASE_VERSION = 1;
-        private static final String SQL_CRETAE_ACTION_TABLE = "create table " + ActionTable.TABLE_NAME + " (" +
+        private static final String SQL_CRETAE_ACTION_TABLE = "create table " + ActionTable
+                .TABLE_NAME + " (" +
                 ActionTable.ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                 ActionTable.TITLE + " TEXT," +
                 ActionTable.DESCRIPTION + " TEXT," +

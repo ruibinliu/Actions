@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -58,10 +59,19 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
                 }
             }
         });
+        holder.mAchieveBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (mCallback != null) {
+                    mCallback.onActionCheckChanged(action, isChecked);
+                }
+            }
+        });
 
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
         holder.mTitleView.setText(action.getTitle());
+        holder.mAchieveBox.setChecked(action.isAchieved());
     }
 
     // Return the size of your dataset (invoked by the layout manager)
@@ -72,5 +82,6 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
 
     interface Callback {
         public void onActionClicked(Action action);
+        public void onActionCheckChanged(Action action, boolean isChecked);
     }
 }

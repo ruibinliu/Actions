@@ -71,6 +71,7 @@ public class EditActivity extends AppCompatActivity {
                     mAction.setDescription(mDescriptionText.getText().toString());
                     ActionController.getInstance().save(mAction);
                     makeToast(R.string.save_success);
+                    sendBroadcast(new Intent(ActionController.ACTION_DATABASE_CHANGED));
                     finish();
                     break;
                 case R.id.action_discard:

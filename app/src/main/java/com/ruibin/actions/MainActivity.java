@@ -104,6 +104,11 @@ public class MainActivity extends AppCompatActivity {
         public void onActionClicked(Action action) {
             DetailActivity.start(MainActivity.this, action);
         }
+
+        @Override
+        public void onActionCheckChanged(Action action, boolean isChecked) {
+            ActionController.getInstance().setAchievement(action, isChecked);
+        }
     }
 
     private void makeToast(String text) {

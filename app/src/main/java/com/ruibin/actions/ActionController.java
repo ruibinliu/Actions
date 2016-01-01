@@ -24,6 +24,11 @@ public class ActionController {
 
     private LocalBroadcastManager broadcastManager;
 
+    public void setAchievement(Action action, boolean isAchieve) {
+        action.setAchieved(isAchieve);
+        DatabaseController.getInstance().update(action);
+    }
+
     public void save(Action action) {
         if (action.getId() > 0) {
             DatabaseController.getInstance().update(action);
@@ -37,5 +42,9 @@ public class ActionController {
 
     public Action find(int id) {
         return DatabaseController.getInstance().find(id);
+    }
+
+    public void delete() {
+        DatabaseController.getInstance().delete();
     }
 }
