@@ -44,6 +44,41 @@ public class ActionsTest {
         lunchMainActivityFromHomeScreen();
     }
 
+    private void lunchMainActivityFromHomeScreen() {
+        // Start from the home screen
+        mDevice.pressHome();
+
+        // Wait for launcher
+        final String launcherPackage = getLauncherPackageName();
+        assertThat(launcherPackage, notNullValue());
+        mDevice.wait(Until.hasObject(By.pkg(launcherPackage).depth(0)), LAUNCH_TIMEOUT);
+
+        // Launch the blueprint app
+        Context context = InstrumentationRegistry.getContext();
+        final Intent intent = context.getPackageManager().getLaunchIntentForPackage(PACKAGE_NAME);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);    // Clear out any previous instances
+        context.startActivity(intent);
+
+        // Wait for the app to appear
+        mDevice.wait(Until.hasObject(By.pkg(PACKAGE_NAME).depth(0)), LAUNCH_TIMEOUT);
+    }
+
+    /**
+     * Uses package manager to find the package name of the device launcher. Usually this package
+     * is "com.android.launcher" but can be different at times. This is a generic solution which
+     * works on all platforms.`
+     */
+    private String getLauncherPackageName() {
+        // Create launcher Intent
+        final Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_HOME);
+
+        // Use PackageManager to get the launcher package name
+        PackageManager pm = InstrumentationRegistry.getContext().getPackageManager();
+        ResolveInfo resolveInfo = pm.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY);
+        return resolveInfo.activityInfo.packageName;
+    }
+
     @Test
     public void testActions_addAction() {
         // Clear all action in database.
@@ -88,60 +123,19 @@ public class ActionsTest {
             // Mark the action as 'achieved' status
             uiObject.click();
 
+            // Finish the activity, cause it to be destroy.
+            mDevice.pressBack();
+
+            lunchMainActivityFromHomeScreen();
+
+            uiObject = mDevice.findObject(new UiSelector()
+                    .className("android.support.v7.widget.RecyclerView")
+                    .instance(0)
+                    .childSelector(new UiSelector().className("android.widget.CheckBox")));
+
             assertTrue(uiObject.isChecked());
         } catch (UiObjectNotFoundException e) {
             e.printStackTrace();
         }
-
-        // Finish the activity, cause it to be destroy.
-        mDevice.pressBack();
-
-        lunchMainActivityFromHomeScreen();
-
-        uiObject = mDevice.findObject(new UiSelector()
-                .className("android.support.v7.widget.RecyclerView")
-                .instance(0)
-                .childSelector(new UiSelector().className("android.widget.CheckBox")));
-
-        try {
-            assertTrue(uiObject.isChecked());
-        } catch (UiObjectNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void lunchMainActivityFromHomeScreen() {
-        // Start from the home screen
-        mDevice.pressHome();
-
-        // Wait for launcher
-        final String launcherPackage = getLauncherPackageName();
-        assertThat(launcherPackage, notNullValue());
-        mDevice.wait(Until.hasObject(By.pkg(launcherPackage).depth(0)), LAUNCH_TIMEOUT);
-
-        // Launch the blueprint app
-        Context context = InstrumentationRegistry.getContext();
-        final Intent intent = context.getPackageManager().getLaunchIntentForPackage(PACKAGE_NAME);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);    // Clear out any previous instances
-        context.startActivity(intent);
-
-        // Wait for the app to appear
-        mDevice.wait(Until.hasObject(By.pkg(PACKAGE_NAME).depth(0)), LAUNCH_TIMEOUT);
-    }
-
-    /**
-     * Uses package manager to find the package name of the device launcher. Usually this package
-     * is "com.android.launcher" but can be different at times. This is a generic solution which
-     * works on all platforms.`
-     */
-    private String getLauncherPackageName() {
-        // Create launcher Intent
-        final Intent intent = new Intent(Intent.ACTION_MAIN);
-        intent.addCategory(Intent.CATEGORY_HOME);
-
-        // Use PackageManager to get the launcher package name
-        PackageManager pm = InstrumentationRegistry.getContext().getPackageManager();
-        ResolveInfo resolveInfo = pm.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY);
-        return resolveInfo.activityInfo.packageName;
     }
 }
